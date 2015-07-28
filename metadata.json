@@ -1,0 +1,41 @@
+{
+  "name": "shibboleth-sp",
+  "description": "Installs/Configures Shibboleth Service Provider",
+  "long_description": "",
+  "maintainer": "The Wharton School - The University of Pennsylvania",
+  "maintainer_email": "chef-admins@wharton.upenn.edu",
+  "license": "Apache 2.0",
+  "platforms": {
+    "centos": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0",
+    "windows": ">= 0.0.0"
+  },
+  "dependencies": {
+    "apache2": ">= 0.0.0",
+    "windows": ">= 0.0.0",
+    "yum": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+    "shibboleth-sp": "Installs and enables base Shibboleth Service Provider.",
+    "shibboleth-sp::apache": "Base recipe and Apache handling.",
+    "shibboleth-sp::iis": "Base recipe and IIS handling.",
+    "shibboleth-sp::simple": "Base recipe and simple attribute-driven configuration.",
+    "shibboleth-sp::sp_cert_key": "Recipe to configure sp cert and key using databags or node attributes."
+  },
+  "version": "0.2.1"
+}

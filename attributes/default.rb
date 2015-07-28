@@ -47,6 +47,14 @@ default['shibboleth-sp']['Handler']['Status']['acl'] = "127.0.0.1 ::1"
 # Metadata Handler Child Elements
 default['shibboleth-sp']['Handler']['MetadataGenerator']['childElements'] = nil
 
+# Mathspace: MetadataProvider tags - we need one per IDP.
+default['shibboleth-sp']['MetadataProviders'] = []
+
+# Mathspace: list of attribute names in attribute-map.xml
+# we can use as username shib-headers
+default['shibboleth-sp']['username-attributes'] = []
+
+
 # Logging
 default['shibboleth-sp']['logging']['root'] = "INFO"
 default['shibboleth-sp']['logging']['OpenSAML']['MessageDecoder'] = nil
@@ -73,6 +81,12 @@ default['shibboleth-sp']['logging']['XMLTooling']['StorageService'] = nil
 	# {"name" => "lastName", "id" => "lastName", "nameFormat" => "basic"}
 # ]
 
+# Configuration for Apache.
+default['shibboleth-sp']['apache2']['doc_root'] = '/srv/shibsp_site'
+default['shibboleth-sp']['apache2']['listen_port'] = 81
+default['shibboleth-sp']['apache2']['backend_site'] = 'http://localhost'
+default['shibboleth-sp']['apache2']['proxy_pass_path'] = '/shibboleth/'
+
 # Platform specific customizations
 case node['platform']
 when 'windows'
@@ -87,7 +101,7 @@ when 'centos','redhat'
 when 'ubuntu'
   default['shibboleth-sp']['dir'] = "/etc/shibboleth"
   default['shibboleth-sp']['user'] = "_shibd"
-else 
+else
   default['shibboleth-sp']['dir'] = "/etc/shibboleth"
   default['shibboleth-sp']['user'] = "shibd"
 end
