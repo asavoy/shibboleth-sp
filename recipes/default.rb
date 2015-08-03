@@ -17,6 +17,63 @@
 # limitations under the License.
 #
 
+
+# Set our Shibboleth SP entityId.
+node.override['shibboleth-sp']['entityID'] = "https://mathspace.co/shibboleth"
+
+# Set the hostname that clients and IdPs must use to reach this SP.
+# Note the port should be defined here too.
+node.override['shibboleth-sp']['apache2']['server_name'] = "#{node[:dns][:public_host]}:443"
+
+# Force handler URLs to require HTTPS.
+node.override['shibboleth-sp']['Sessions']['handlerSSL'] = 'true'
+
+# Setup for error pages.
+node.override['shibboleth-sp']['Errors']['supportContact']  = 'info@mathspace.com.au'
+
+# We don't use a discovery page so we act like there is
+# only one IDP in the config below. Other IDPs can be passed
+# through with Login?entityID=foo though, and these must be
+# provided via <MetadataProvider> tag in shibboleth2.xml
+node.override['shibboleth-sp']['SSO']['entityID'] = 'https://idp3.lgfl.org.uk/idp/shibboleth'
+node.override['shibboleth-sp']['SSO']['discoveryProtocol'] = ''
+
+node.override['shibboleth-sp']['MetadataProviders'] = [
+    {
+        'url'              => 'https://wayf.org.uk/lgfl-metadata.xml',
+        'backingFilePath'  => 'lgfl-metadata.xml',
+        'reloadInterval'   => '180000',
+        'type'             => 'XML',
+    },
+    {
+        'url'              => 'https://sts.platform.rmunify.com/SAMLMetadata/Unify-Live-Metadata.xml',
+        'backingFilePath'  => 'RMUnifymetadata.xml',
+        'reloadInterval'   => '7200',
+        'type'             => 'XML',
+    },
+]
+
+node.override['shibboleth-sp']['username-attributes'] = [
+    # lgfl
+    "urn:mace:dir:attribute-def:eduPersonPrincipalName",
+    "urn:oid:1.3.6.1.4.1.5923.1.1.1.6",
+    # rmunify
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
+]
+
+# Find an app server that will be the backend site.
+if !Chef::Config[:solo]
+  app_nodes = search('node', "role:app_server AND cloud_local_ipv4:* AND chef_environment:#{node.chef_environment}") || []
+else
+  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+  app_nodes = []
+end
+if app_nodes
+  app_node = app_nodes.first
+  node.override['shibboleth-sp']['apache2']['backend_site'] = "http://#{app_node['cloud']['local_ipv4']}:#{app_node['mathspace_app']['nginx']['port']}"
+end
+
+
 repo_url = "http://download.opensuse.org/repositories/security:/shibboleth"
 
 case node['platform']
