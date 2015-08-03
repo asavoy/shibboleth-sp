@@ -57,16 +57,9 @@ web_app "shibsp_site" do
 end
 
 # Setup firewall rules.
-if !Chef::Config[:solo]
-  cluster_members = search('node', "chef_environment:#{node.chef_environment} AND cloud_local_ipv4:*") || []
-else
-  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  cluster_members = []
-end
-cluster_members.map! do |cluster_member|
-  firewall_rule "apache shibboleth-sp site allow #{cluster_member.name}" do
-    source cluster_member['cloud']['local_ipv4']
-    port node['shibboleth-sp']['apache2']['listen_port']
-    action :allow
-  end
+allow_eth2 = CommonUtil.validate_eth2_ip_range(node, node['959947-mathspace']['private_net'])
+
+if allow_eth2
+  # Allow communication over private net
+  add_iptables_rule('INPUT', '-i eth2 -j ACCEPT', 50, 'Allow communication over private net')
 end
