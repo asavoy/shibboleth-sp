@@ -16,6 +16,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe 'chef-sugar-rackspace::default'
+
+# Find an app server that will be the backend site.
+api_nodes = bd_search(node, 'api')
+if api_nodes.count < 1
+  fail "Cannot find api: no results."
+end
+api_node = api_nodes.first
+
+# Set our Shibboleth SP entityId.
+node.override['shibboleth-sp']['entityID'] = "https://mathspace.co/shibboleth"
+
+# Set the hostname that clients and IdPs must use to reach this SP.
+# Note the port should be defined here too.
+node.override['shibboleth-sp']['apache2']['server_name'] = "#{node[:dns][:public_host]}:443"
+
+# Force handler URLs to require HTTPS.
+node.override['shibboleth-sp']['Sessions']['handlerSSL'] = 'true'
+
+# Setup for error pages.
+node.override['shibboleth-sp']['Errors']['supportContact']  = 'info@mathspace.com.au'
+
+# We don't use a discovery page so we act like there is
+# only one IDP in the config below. Other IDPs can be passed
+# through with Login?entityID=foo though, and these must be
+# provided via <MetadataProvider> tag in shibboleth2.xml
+node.override['shibboleth-sp']['SSO']['entityID'] = 'https://idp3.lgfl.org.uk/idp/shibboleth'
+node.override['shibboleth-sp']['SSO']['discoveryProtocol'] = ''
+
+node.override['shibboleth-sp']['MetadataProviders'] = [
+    {
+        'url'              => 'https://wayf.org.uk/lgfl-metadata.xml',
+        'backingFilePath'  => 'lgfl-metadata.xml',
+        'reloadInterval'   => '180000',
+        'type'             => 'XML',
+    },
+    {
+        'url'              => 'https://sts.platform.rmunify.com/SAMLMetadata/Unify-Live-Metadata.xml',
+        'backingFilePath'  => 'RMUnifymetadata.xml',
+        'reloadInterval'   => '7200',
+        'type'             => 'XML',
+    },
+]
+
+node.override['shibboleth-sp']['username-attributes'] = [
+    # lgfl
+    "urn:mace:dir:attribute-def:eduPersonPrincipalName",
+    "urn:oid:1.3.6.1.4.1.5923.1.1.1.6",
+    # rmunify
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
+]
+
+node.override['shibboleth-sp']['apache2']['backend_site'] = "http://#{api_node['cloud']['local_ipv4']}:81"
+
 
 repo_url = "http://download.opensuse.org/repositories/security:/shibboleth"
 
