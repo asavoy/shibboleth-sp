@@ -1,4 +1,4 @@
-name              "ms-shibboleth-sp"
+name              "shibboleth-sp"
 maintainer        ""
 maintainer_email  ""
 license           "Apache 2.0"
