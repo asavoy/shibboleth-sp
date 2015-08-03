@@ -16,7 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe 'chef-sugar-rackspace::default'
 
+# Find an app server that will be the backend site.
+api_nodes = bd_search(node, 'api')
+if api_nodes.count < 1
+  fail "Cannot find api: no results."
+end
+api_node = api_nodes.first
 
 # Set our Shibboleth SP entityId.
 node.override['shibboleth-sp']['entityID'] = "https://mathspace.co/shibboleth"
@@ -61,17 +68,7 @@ node.override['shibboleth-sp']['username-attributes'] = [
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
 ]
 
-# Find an app server that will be the backend site.
-if !Chef::Config[:solo]
-  app_nodes = search('node', "role:app_server AND cloud_local_ipv4:* AND chef_environment:#{node.chef_environment}") || []
-else
-  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  app_nodes = []
-end
-if app_nodes
-  app_node = app_nodes.first
-  node.override['shibboleth-sp']['apache2']['backend_site'] = "http://#{app_node['cloud']['local_ipv4']}:#{app_node['mathspace_app']['nginx']['port']}"
-end
+node.override['shibboleth-sp']['apache2']['backend_site'] = "http://#{api_node['cloud']['local_ipv4']}:#{api_node['mathspace_app']['nginx']['port']}"
 
 
 repo_url = "http://download.opensuse.org/repositories/security:/shibboleth"
