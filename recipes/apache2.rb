@@ -31,6 +31,12 @@ include_recipe "apache2::mod_proxy"
 include_recipe "apache2::mod_proxy_http"
 
 # Enable mod_shib.
+# HACK: This is needed to set the correct module name "mod_shib", otherwise
+# it is set to "shib2_module" causing the error "undefined symbol" is thrown when
+# starting Apache.
+file "#{node['apache']['dir']}/mods-available/shib2.load" do
+  content "LoadModule mod_shib #{node['apache']['libexecdir']}/mod_shib2.so"
+end
 apache_module "shib2" do
   enable true
 end
@@ -52,7 +58,7 @@ web_app "shibsp_site" do
   # Note, this affects the URLs generated in `/Shibboleth/Metadata`.
   #server_name "#{node['dns']['public_host']}"
   server_name node['shibboleth-sp']['apache2']['server_name']
-  server_aliases [node['fqdn'], node['hostname'],]
+  server_aliases ['*']
   docroot node['shibboleth-sp']['apache2']['doc_root']
 end
 
