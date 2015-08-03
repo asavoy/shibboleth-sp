@@ -52,7 +52,7 @@ web_app "shibsp_site" do
   # Note, this affects the URLs generated in `/Shibboleth/Metadata`.
   #server_name "#{node['dns']['public_host']}"
   server_name node['shibboleth-sp']['apache2']['server_name']
-  server_aliases [node['fqdn'], node['hostname'],]
+  server_aliases ['*']
   docroot node['shibboleth-sp']['apache2']['doc_root']
 end
 
