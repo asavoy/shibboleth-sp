@@ -30,7 +30,7 @@ node.override['shibboleth-sp']['entityID'] = "https://mathspace.co/shibboleth"
 
 # Set the hostname that clients and IdPs must use to reach this SP.
 # Note the port should be defined here too.
-node.override['shibboleth-sp']['apache2']['server_name'] = "#{node[:dns][:public_host]}:443"
+node.override['shibboleth-sp']['apache2']['server_name'] = "#{node['fqdn']}:443"
 
 # Force handler URLs to require HTTPS.
 node.override['shibboleth-sp']['Sessions']['handlerSSL'] = 'true'
