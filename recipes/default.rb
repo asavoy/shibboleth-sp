@@ -68,7 +68,7 @@ node.override['shibboleth-sp']['username-attributes'] = [
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
 ]
 
-node.override['shibboleth-sp']['apache2']['backend_site'] = "http://#{api_node['cloud']['local_ipv4']}:#{api_node['mathspace_app']['nginx']['port']}"
+node.override['shibboleth-sp']['apache2']['backend_site'] = "http://#{api_node['cloud']['local_ipv4']}:81"
 
 
 repo_url = "http://download.opensuse.org/repositories/security:/shibboleth"
