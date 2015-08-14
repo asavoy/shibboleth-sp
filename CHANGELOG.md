@@ -1,3 +1,7 @@
+## 2.0.0
+
+* TODO
+
 ## 0.2.1
 
 * Added `node['shibboleth-sp']['Handler']['MetadataGenerator']['childElements']` attribute. 
