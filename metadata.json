@@ -37,5 +37,5 @@
     "shibboleth-sp::simple": "Base recipe and simple attribute-driven configuration.",
     "shibboleth-sp::sp_cert_key": "Recipe to configure sp cert and key using databags or node attributes."
   },
-  "version": "2.0.0"
+  "version": "2.0.1"
 }
