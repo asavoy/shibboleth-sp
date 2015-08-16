@@ -24,6 +24,11 @@
     require valid-user
   </Location>
 
+  # Allow access to the Shibboleth handlers (else receive 403 Forbidden).
+  <Location /Shibboleth.sso>
+    Require all granted
+  </Location>
+
   # Setup reverse proxy to the backend application, for users that successfully authenticated.
   ProxyPass <%= @params[:proxy_pass_path] %> <%= @params[:backend_site] + @params[:proxy_pass_path] %>
   # Use the Host in the original request, so we can conform with Django ALLOWED_HOSTS.
